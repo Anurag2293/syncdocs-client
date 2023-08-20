@@ -2,6 +2,7 @@ import { useState, useCallback, useEffect } from 'react'
 import Quill from 'quill'
 import 'quill/dist/quill.snow.css'
 import { io } from 'socket.io-client'
+import { useParams } from 'react-router-dom'
 
 const TOOLBAR_OPTIONS = [
     [{ header: [1, 2, 3, 4, 5, 6, false] }],
@@ -16,6 +17,7 @@ const TOOLBAR_OPTIONS = [
 ]
 
 const TextEditor = () => {
+    const { id: documentId } = useParams()
     const [socket, setSocket] = useState()
     const [quill, setQuill] = useState()
 
@@ -30,6 +32,19 @@ const TextEditor = () => {
         }
     }, [])
 
+    // For fetching initial document
+    useEffect(() => {
+        if (socket == null || quill == null) return
+
+        socket.once('load-document', document => {
+            quill.setContents(document)
+            quill.enable()
+        })
+
+        socket.emit('get-document', documentId)
+    }, [socket, quill, documentId])
+
+    // For writing to the document
     useEffect(() => {
         if (quill == null || socket == null) return
 
@@ -44,6 +59,7 @@ const TextEditor = () => {
         }
     }, [socket, quill])
 
+    // For receiving changes from other users and updating the document
     useEffect(() => {
         if (quill == null || socket == null) return
 
@@ -70,11 +86,15 @@ const TextEditor = () => {
                 toolbar: TOOLBAR_OPTIONS
             },
         })
+
+        q.disable()
+        q.setText('Loading...')
+
         setQuill(q)
     }, [])
 
     return (
-        <div className="container" ref={wrapperRef}>TextEditor</div>
+        <div className="container" ref={wrapperRef}></div>
     )
 }
 
