@@ -1,36 +1,10 @@
-import { Link } from "react-router-dom"
+import { useContext } from 'react'
 import { useForm } from "react-hook-form";
+import userContext from "../context/user/userContext";
 
-export default function Signup({ setTab }) {
+export default function Signup({ setTab, setLoggedIn }) {
+    const { handleSignupSubmit } = useContext(userContext)
     const { register, handleSubmit, watch, formState: { errors } } = useForm();
-
-    const handleSignupSubmit = async (data) => {
-        console.log(data)
-        try {
-            const response = await fetch('http://localhost:3001/users', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json' // Set the Content-Type header
-                },
-                body: JSON.stringify({
-                    name: data.name,
-                    email: data.email,
-                    password: data.password
-                })
-            });
-            const { user, token, message } = await response.json();
-
-            if (!user) {
-                throw new Error(message)
-            }
-            
-            localStorage.setItem('userToken', token)
-            console.log({user, token})
-        } catch (error) {
-            alert(error.message)
-        }
-
-    }
 
     return (
         <div className="flex min-h-full flex-1 flex-col justify-center px-6 py-12 my-auto lg:px-8">
