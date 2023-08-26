@@ -121,7 +121,7 @@ const TextEditor = () => {
     }, [])
 
     return (
-        <div className="container" ref={wrapperRef}></div>
+        <div className="container bg-editor-white m-0" ref={wrapperRef}></div>
     )
 }
 

@@ -1,5 +1,6 @@
 import { v4 as uuidV4 } from "uuid"
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom"
+import './App.css'
 
 import TextEditor from "./pages/TextEditor"
 import Dashboard from "./pages/Dashboard"
