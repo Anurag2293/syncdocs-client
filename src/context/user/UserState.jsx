@@ -8,7 +8,7 @@ const UserState = (props) => {
 
     const fetchUser = async (token) => {
         try {
-            const response = await fetch('http://localhost:3001/users/', {
+            const response = await fetch(`${import.meta.env.VITE_SERVER_URL}/users/`, {
                 method: 'GET',
                 headers: {
                     'Authorization' : `Bearer ${token}`
@@ -29,7 +29,7 @@ const UserState = (props) => {
 
     const handleLoginSubmit = async (data) => {
         try {
-            const response = await fetch('http://localhost:3001/users/login', {
+            const response = await fetch(`${import.meta.env.VITE_SERVER_URL}/users/login`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json' // Set the Content-Type header
@@ -55,7 +55,7 @@ const UserState = (props) => {
     const handleSignupSubmit = async (data) => {
         console.log(data)
         try {
-            const response = await fetch('http://localhost:3001/users', {
+            const response = await fetch(`${import.meta.env.VITE_SERVER_URL}/users`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json' // Set the Content-Type header
@@ -83,8 +83,29 @@ const UserState = (props) => {
         }
     }
 
+    const handleLogout = async () => {
+        try {
+            const response = await fetch(`${import.meta.env.VITE_SERVER_URL}/users/logout`, {
+                method: 'POST',
+                headers: {
+                    Authorization: `Bearer ${user.token}`
+                }
+            })
+            if (response.ok) {
+                localStorage.removeItem('userToken')
+                setUser({ name: '', email: '', token: '' })
+                setLoggedIn(false)
+            }
+            else {
+                alert('Error while logging out')
+            }
+        } catch (error) {
+            alert(error.message)
+        }
+    }
+
     return (
-        <UserContext.Provider value={{ loggedIn, user, fetchUser, handleSignupSubmit, handleLoginSubmit }}>
+        <UserContext.Provider value={{ loggedIn, user, fetchUser, handleSignupSubmit, handleLoginSubmit, handleLogout }}>
             {props.children}
         </UserContext.Provider>
     )
