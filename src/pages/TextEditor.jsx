@@ -2,7 +2,7 @@ import { useState, useCallback, useEffect } from 'react'
 import Quill from 'quill'
 import 'quill/dist/quill.snow.css'
 import { io } from 'socket.io-client'
-import { useParams } from 'react-router-dom'
+import { useParams, useNavigate } from 'react-router-dom'
 
 const SAVE_INTERVAL_MS = 2000
 const TOOLBAR_OPTIONS = [
@@ -18,13 +18,21 @@ const TOOLBAR_OPTIONS = [
 ]
 
 const TextEditor = () => {
+    const navigate = useNavigate()
     const { id: documentId } = useParams()
     const [socket, setSocket] = useState()
     const [quill, setQuill] = useState()
 
     useEffect(() => {
         const s = io('http://localhost:3001', {
-            transports: ['websocket', 'polling', 'flashsocket']
+            transports: ['websocket', 'polling', 'flashsocket'],
+            query: {
+                documentId: documentId,
+                username: 'Rishabh'
+            },
+            auth: {
+                token: '123'
+            }
         })
         setSocket(s)
 
@@ -36,6 +44,11 @@ const TextEditor = () => {
     // For fetching initial document
     useEffect(() => {
         if (socket == null || quill == null) return
+
+        socket.on("connect_error", (err) => {
+            alert(err.message)
+            navigate('/dashboard')
+        })
 
         socket.once('load-document', document => {
             quill.setContents(document)
